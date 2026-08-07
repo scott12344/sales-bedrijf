@@ -17,13 +17,13 @@ import { bouwVariabelen, kies, kiesMeerdere, kortAf, maakRng, opschonen, titelCa
 /* ------------------------------------------------------------------ hooks */
 
 const HOOKS: Record<Hoek, string[]> = {
-  'voor-na': [
-    'Zelfde huis. Andere uitstraling.',
-    'Van gedateerd naar strak in één dag',
-    'Dit was het. En dit is het nu.',
-    'Kijk wat er gebeurt als de oude kozijnen eruit gaan',
-    'Dezelfde gevel, nauwelijks te geloven',
-    'Even geduld voor het tweede beeld',
+  resultaat: [
+    'Weer een woning klaar in {plaats}',
+    'Zo staat het erbij na één dag werk',
+    'Deze gevel mag er weer twintig jaar tegen',
+    'Vanochtend begonnen, vanmiddag klaar',
+    'Hier zijn we deze week trots op',
+    'Strak. En dat is precies de bedoeling.',
   ],
   aanbod: [
     '{actie}',
@@ -40,8 +40,8 @@ const HOOKS: Record<Hoek, string[]> = {
     'Je stookt nu deels voor de straat',
   ],
   bewijs: [
-    'Weer een woning klaar in {plaats}',
     '{score} gemiddeld. Daar doen we het voor.',
+    'Dit zeggen klanten die je niet kent, over werk dat je wel ziet',
     'Dit schreef een klant na de oplevering',
     'Zo ziet vakwerk er van dichtbij uit',
     'Al {jaren} jaar dezelfde afspraak: strak opgeleverd',
@@ -118,7 +118,7 @@ const CTAS: Record<Doel, { knop: string; regel: string[] }> = {
   },
   volgers: {
     knop: 'Volg ons',
-    regel: ['Volg ons voor meer vóór/ná uit de regio', 'Volgen? Elke week een nieuw project'],
+    regel: ['Volg ons voor meer werk uit de regio', 'Volgen? Elke week een nieuw project'],
   },
   vertrouwen: {
     knop: 'Bekijk ons werk',
@@ -137,7 +137,7 @@ const OPENERS: Record<string, string[]> = {
   bewijs: [
     'Deze week opgeleverd in {plaats}.',
     'Weer een woning die er voor de komende twintig jaar tegen kan.',
-    'Klaar. En de klant zag het verschil meteen.',
+    'Klaar, opgeruimd en de klant is tevreden.',
   ],
   aanbod: [
     'Loop je al langer met dit plan rond? Dit is het moment.',
@@ -255,8 +255,8 @@ export function werkIdeeUit(idee: Idee, merk: Merk, seed: number): Uitwerking {
 
   const badge = actie
     ? vul(actie.claim, v)
-    : idee.hoek === 'voor-na'
-      ? 'VÓÓR / NÁ'
+    : idee.hoek === 'resultaat'
+      ? merk.werkgebied[0]?.toUpperCase() || 'OPGELEVERD'
       : idee.hoek === 'bewijs' && merk.bewijs.reviewScore
         ? `★ ${merk.bewijs.reviewScore}`
         : idee.hoek === 'seizoen'
@@ -295,7 +295,7 @@ export function werkIdeeUit(idee: Idee, merk: Merk, seed: number): Uitwerking {
   const bezwaarAntwoord = beantwoordBezwaar(bezwaar, v);
 
   const opener = vul(
-    kies(rng, OPENERS[idee.hoek === 'bewijs' || idee.hoek === 'voor-na' ? 'bewijs' : idee.hoek === 'aanbod' ? 'aanbod' : 'probleem']).replace(
+    kies(rng, OPENERS[idee.hoek === 'bewijs' || idee.hoek === 'resultaat' ? 'bewijs' : idee.hoek === 'aanbod' ? 'aanbod' : 'probleem']).replace(
       '{pijn}',
       pijn,
     ),
@@ -479,34 +479,34 @@ function bouwVideo(
 ): Uitwerking['video'] {
   const hook = kortAf(b.kop, 42);
 
-  const scenesVoorNa: VideoScene[] = [
+  const scenesResultaat: VideoScene[] = [
     {
       van: 0,
       tot: 2,
-      beeld: 'Statisch shot van de oude gevel, camera stil. Geen intro, meteen beeld.',
+      beeld: 'Detail van het nieuwe kozijn, camera beweegt langzaam. Geen intro, meteen beeld.',
       tekstOpBeeld: hook,
-      voiceover: `Dit is de voorkant van een woning in ${v.plaats}.`,
+      voiceover: `Deze week waren we in ${v.plaats}.`,
     },
     {
       van: 2,
       tot: 5,
-      beeld: 'Inzoomen op het probleem: verweerd hout, kit die loslaat, condens tussen het glas.',
+      beeld: 'Wat de klant eraan had: de ergernis die verdween, in één shot verteld.',
       tekstOpBeeld: titelCase(b.pijn),
-      voiceover: 'De kozijnen waren op. Tocht, condens en elke vijf jaar de schilder.',
+      voiceover: 'Dit was waar ze tegenaan liepen.',
     },
     {
       van: 5,
       tot: 9,
-      beeld: 'Snelle montagebeelden: oude kozijn eruit, nieuwe erin, stellen en afkitten.',
+      beeld: 'Snelle montagebeelden: kozijn stellen, afkitten, opruimen.',
       tekstOpBeeld: 'In één dag geplaatst',
       voiceover: 'Eén dag werk. Vloeren afgedekt, alles opgeruimd.',
     },
     {
       van: 9,
       tot: 13,
-      beeld: 'Exact hetzelfde camerastandpunt als scène 1 — dat maakt het verschil zichtbaar.',
-      tekstOpBeeld: 'En nu.',
-      voiceover: 'Zelfde huis, zelfde standpunt.',
+      beeld: 'Het eindresultaat in het mooiste licht — het beeld waar de video om draait.',
+      tekstOpBeeld: 'Zo staat het er nu bij.',
+      voiceover: 'En dit is het resultaat.',
     },
     {
       van: 13,
@@ -555,13 +555,13 @@ function bouwVideo(
     },
   ];
 
-  const scenes = idee.hoek === 'voor-na' || idee.hoek === 'bewijs' ? scenesVoorNa : scenesUitleg;
+  const scenes = idee.hoek === 'resultaat' || idee.hoek === 'bewijs' ? scenesResultaat : scenesUitleg;
 
   return {
     hook,
     scenes,
     muziek:
-      idee.hoek === 'voor-na'
+      idee.hoek === 'resultaat'
         ? 'Rustige opbouw met een duidelijk omslagpunt op de onthulling (seconde 9).'
         : 'Neutrale achtergrondmuziek, laag in de mix — je stem moet leidend blijven.',
     lengte: scenes[scenes.length - 1].tot,

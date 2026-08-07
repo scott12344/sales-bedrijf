@@ -10,8 +10,7 @@ export interface PreviewProps {
   kanaal: KanaalId;
   merk: Merk;
   inhoud: Inhoud;
-  beeldVoorId?: ID;
-  beeldNaId?: ID;
+  beeldId?: ID;
   naam: string;
   compact?: boolean;
 }
@@ -39,7 +38,7 @@ export function Preview(props: PreviewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const kanaal = kanaalById(props.kanaal);
   const formaat = formaatVan(props.kanaal);
-  const [voor, na, logo] = useBeelden([props.beeldVoorId, props.beeldNaId, props.merk.logoMediaId]);
+  const [beeld, logo] = useBeelden([props.beeldId, props.merk.logoMediaId]);
 
   const spec = useMemo(
     () => ({
@@ -47,11 +46,10 @@ export function Preview(props: PreviewProps) {
       formaat,
       merk: props.merk,
       inhoud: props.inhoud,
-      beeldVoor: voor,
-      beeldNa: na,
+      beeld,
       logo,
     }),
-    [props.sjabloonId, props.merk, props.inhoud, formaat, voor, na, logo],
+    [props.sjabloonId, props.merk, props.inhoud, formaat, beeld, logo],
   );
 
   useEffect(() => {
@@ -93,9 +91,8 @@ export async function rendersVoorKanalen(
   basis: Omit<PreviewProps, 'kanaal' | 'naam' | 'compact'>,
   merkLogoId?: ID,
 ): Promise<{ kanaal: KanaalId; blob: Blob }[]> {
-  const [voor, na, logo] = await Promise.all([
-    basis.beeldVoorId ? beeldElement(basis.beeldVoorId) : null,
-    basis.beeldNaId ? beeldElement(basis.beeldNaId) : null,
+  const [beeld, logo] = await Promise.all([
+    basis.beeldId ? beeldElement(basis.beeldId) : null,
     merkLogoId ? beeldElement(merkLogoId) : null,
   ]);
 
@@ -107,8 +104,7 @@ export async function rendersVoorKanalen(
       formaat: formaatVan(kanaal),
       merk: basis.merk,
       inhoud: basis.inhoud,
-      beeldVoor: voor,
-      beeldNa: na,
+      beeld,
       logo,
     });
     uit.push({ kanaal, blob: await canvasNaarBlob(canvas) });

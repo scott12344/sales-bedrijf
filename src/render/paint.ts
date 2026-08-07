@@ -314,28 +314,6 @@ function ster(c: CanvasRenderingContext2D, cx: number, cy: number, r: number) {
   c.fill();
 }
 
-/** Pijl die naar het tweede beeld wijst in een vóór/ná. */
-export function pijl(x: Ctx, px: number, py: number, maat: number, kleur: string, achter: string) {
-  const { c } = x;
-  c.save();
-  c.fillStyle = achter;
-  c.beginPath();
-  c.arc(px, py, maat, 0, Math.PI * 2);
-  c.fill();
-  c.strokeStyle = kleur;
-  c.lineWidth = maat * 0.16;
-  c.lineCap = 'round';
-  c.lineJoin = 'round';
-  c.beginPath();
-  c.moveTo(px - maat * 0.35, py);
-  c.lineTo(px + maat * 0.3, py);
-  c.moveTo(px + maat * 0.05, py - maat * 0.3);
-  c.lineTo(px + maat * 0.35, py);
-  c.lineTo(px + maat * 0.05, py + maat * 0.3);
-  c.stroke();
-  c.restore();
-}
-
 /* ------------------------------------------------------------------ kleur */
 
 export function metAlfa(hex: string, alfa: number): string {

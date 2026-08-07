@@ -4,9 +4,9 @@ import { beeldUrl, haalAlleMedia, verwijderBeeld, voegBeeldToe } from '../store/
 import { Kaart, Leeg } from './ui';
 
 const SOORTEN: { id: MediaRecord['soort']; label: string; uitleg: string }[] = [
-  { id: 'voor', label: 'Vóór', uitleg: 'De oude situatie. Fotografeer recht van voren, bij daglicht.' },
-  { id: 'na', label: 'Ná', uitleg: 'Exact hetzelfde standpunt als de vóór-foto. Dat maakt het verschil zichtbaar.' },
-  { id: 'sfeer', label: 'Sfeer', uitleg: 'Details, licht door de pui, een mooi opgeleverde gevel.' },
+  { id: 'project', label: 'Project', uitleg: 'Opgeleverd werk. Recht van voren, bij daglicht, geen auto voor de deur.' },
+  { id: 'sfeer', label: 'Sfeer', uitleg: 'Licht door de pui, een mooie gevel, een straatbeeld.' },
+  { id: 'detail', label: 'Detail', uitleg: 'Close-up van de afwerking, het beslag of het profiel. Verkoopt vakmanschap.' },
   { id: 'team', label: 'Team', uitleg: 'Monteurs aan het werk, de bus, de koffiepauze.' },
   { id: 'review', label: 'Review', uitleg: 'Schermafbeeldingen van beoordelingen.' },
   { id: 'logo', label: 'Logo', uitleg: 'Bij voorkeur PNG met transparante achtergrond.' },
@@ -16,7 +16,7 @@ export function MediaScherm() {
   const [media, setMedia] = useState<MediaRecord[]>([]);
   const [urls, setUrls] = useState<Record<string, string>>({});
   const [filter, setFilter] = useState<MediaRecord['soort'] | 'alles'>('alles');
-  const [soort, setSoort] = useState<MediaRecord['soort']>('na');
+  const [soort, setSoort] = useState<MediaRecord['soort']>('project');
   const [sleep, setSleep] = useState(false);
   const [bezig, setBezig] = useState(false);
   const [fout, setFout] = useState<string | null>(null);

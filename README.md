@@ -23,8 +23,8 @@ internet en zonder installatie.
 
 ## Wat het systeem doet
 
-**Studio** — Typ je idee ("vóór en ná van de woning aan de Dorpsstraat"), kies
-invalshoek, doel en doelgroep. Je krijgt terug:
+**Studio** — Typ je idee ("weer een woning klaar in Uden"), kies invalshoek,
+doel en doelgroep. Je krijgt terug:
 
 - Beeld in alle gekozen formaten: feed 1:1 en 4:5, story/reel 9:16, TikTok,
   Meta-advertentie, A5-flyer op 300 dpi en een bouwbord. Elk formaat houdt
@@ -48,8 +48,8 @@ Ideeën komen uit een ideeënbank met seizoensgebonden invalshoeken.
 **Merk & aanbod** — Kleurenpalet, lettertypen, logo, werkgebied, bewijscijfers en
 je lopende acties. Alles wat je hier invult komt automatisch in elke post terecht.
 
-**Beeldbank** — Foto's vóór/ná, sfeer, team en reviews. Ze worden bij het
-toevoegen verkleind naar maximaal 2000 pixels.
+**Beeldbank** — Projectfoto's, sfeer, details, team en reviews. Ze worden bij
+het toevoegen verkleind naar maximaal 2000 pixels.
 
 **Koppelingen** — Publicatieroutes naar Instagram, Facebook en TikTok, plus
 back-up en een zelfstandige kopie van de app inclusief je gegevens.

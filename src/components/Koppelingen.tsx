@@ -70,8 +70,7 @@ export function KoppelingenScherm() {
             cta: uitwerking.cta,
             ctaSub: uitwerking.ctaSub,
           },
-          beeldVoorId: campagne.idee.mediaVoorId,
-          beeldNaId: campagne.idee.mediaNaId,
+          beeldId: campagne.idee.mediaId,
         },
         staat.merk.logoMediaId,
       );

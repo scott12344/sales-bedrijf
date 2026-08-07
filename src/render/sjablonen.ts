@@ -21,7 +21,6 @@ import {
   metAlfa,
   passendeGrootte,
   patroon,
-  pijl,
   rechthoek,
   regelsVoor,
   scrim,
@@ -47,8 +46,7 @@ export interface RenderSpec {
   formaat: Formaat;
   merk: Merk;
   inhoud: Inhoud;
-  beeldVoor?: CanvasImageSource | null;
-  beeldNa?: CanvasImageSource | null;
+  beeld?: CanvasImageSource | null;
   logo?: CanvasImageSource | null;
 }
 
@@ -56,8 +54,8 @@ export interface Sjabloon {
   id: string;
   label: string;
   omschrijving: string;
-  /** Welke beelden dit sjabloon gebruikt. */
-  beelden: 'geen' | 'een' | 'twee';
+  /** Heeft dit sjabloon een foto nodig? */
+  beelden: 'geen' | 'een';
   hoeken: string[];
   teken: (x: Ctx, s: RenderSpec) => void;
 }
@@ -218,16 +216,6 @@ function actiebadge(x: Ctx, s: RenderSpec, px: number, py: number, gecentreerd =
     kleur: s.merk.kleuren.opAccent,
     font: kopFont(s.merk),
     grootte,
-  });
-}
-
-/** Label linksboven op een deel van een vóór/ná-beeld. */
-function beeldLabel(x: Ctx, s: RenderSpec, waarde: string, px: number, py: number, donker: boolean) {
-  badge(x, waarde, px, py, {
-    achtergrond: donker ? 'rgba(17,24,39,0.86)' : s.merk.kleuren.accent,
-    kleur: donker ? '#FFFFFF' : s.merk.kleuren.opAccent,
-    font: kopFont(s.merk),
-    grootte: x.u * 2.9,
   });
 }
 
@@ -394,13 +382,15 @@ function onderblok(x: Ctx, s: RenderSpec, o: OnderblokOpties, alleenMeten = fals
 
 /* -------------------------------------------------------------- sjablonen */
 
-const voorNaSplit: Sjabloon = {
-  id: 'voor-na-split',
-  label: 'Vóór / ná — gedeeld beeld',
+
+
+const beeldKader: Sjabloon = {
+  id: 'beeld-kader',
+  label: 'Beeld met tekstblok',
   omschrijving:
-    'Twee beelden naast of onder elkaar met een duidelijke scheidingslijn. Het sterkste format van deze branche.',
-  beelden: 'twee',
-  hoeken: ['voor-na', 'bewijs'],
+    'Foto boven, tekstblok eronder met kop, regel en knop. De rustigste en meest bruikbare opzet — je vaste basispost.',
+  beelden: 'een',
+  hoeken: ['resultaat', 'bewijs', 'achter-de-schermen', 'seizoen'],
   teken: (x, s) => {
     const m = s.merk;
     rechthoek(x, 0, 0, x.w, x.h, m.kleuren.achtergrond);
@@ -414,100 +404,113 @@ const voorNaSplit: Sjabloon = {
       achtergrond: (t, h) => rechthoek(x, 0, t, x.w, h + x.u * 2, m.kleuren.achtergrond),
     };
 
-    // Eerst meten waar het tekstblok begint, dan het beeld daaronder opbouwen.
-    // Bij story-formaten loopt de foto onder de merkbalk door.
+    // Eerst meten waar het tekstblok begint; het beeld krijgt de rest.
     const zichtbaar = meetOnderblok(x, s, blok) - x.u * 1.5;
     const beeldH = Math.max(zichtbaar, beeldBodem(x));
+
     x.c.save();
     x.c.beginPath();
     x.c.rect(0, 0, x.w, beeldH);
     x.c.clip();
-
-    if (staand(x)) {
-      const helft = zichtbaar / 2;
-      const onderhelft = beeldH - helft;
-      if (s.beeldVoor) beeldVullend(x, s.beeldVoor, 0, 0, x.w, helft);
-      else patroon(x, 0, 0, x.w, helft, metAlfa('#000000', 0.2), '#4B5563');
-      if (s.beeldNa) beeldVullend(x, s.beeldNa, 0, helft, x.w, onderhelft);
-      else patroon(x, 0, helft, x.w, onderhelft, metAlfa(m.kleuren.primair, 0.3), m.kleuren.primairDonker);
-
-      rechthoek(x, 0, helft - x.u * 0.5, x.w, x.u, m.kleuren.accent);
-      beeldLabel(x, s, 'vóór', x.u * 2.5, x.u * 2.5, true);
-      beeldLabel(x, s, 'ná', x.u * 2.5, helft + x.u * 2.5, false);
-      pijl(x, x.w - x.u * 7, helft, x.u * 3.4, m.kleuren.opAccent, m.kleuren.accent);
-    } else {
-      const helft = x.w / 2;
-      if (s.beeldVoor) beeldVullend(x, s.beeldVoor, 0, 0, helft, beeldH);
-      else patroon(x, 0, 0, helft, beeldH, metAlfa('#000000', 0.2), '#4B5563');
-      if (s.beeldNa) beeldVullend(x, s.beeldNa, helft, 0, helft, beeldH);
-      else patroon(x, helft, 0, helft, beeldH, metAlfa(m.kleuren.primair, 0.3), m.kleuren.primairDonker);
-
-      rechthoek(x, helft - x.u * 0.5, 0, x.u, beeldH, m.kleuren.accent);
-      beeldLabel(x, s, 'vóór', x.u * 2.5, x.u * 2.5, true);
-      beeldLabel(x, s, 'ná', helft + x.u * 2.5, x.u * 2.5, false);
-      pijl(x, helft, zichtbaar - x.u * 7, x.u * 3.4, m.kleuren.opAccent, m.kleuren.accent);
-    }
+    achtergrondBeeld(x, s, s.beeld, beeldH);
     x.c.restore();
+
+    // Dunne accentlijn als scheiding tussen beeld en tekst.
+    rechthoek(x, 0, zichtbaar, x.w, x.u * 0.7, m.kleuren.accent);
 
     onderblok(x, s, blok);
   },
 };
 
-const voorNaSchuif: Sjabloon = {
-  id: 'voor-na-schuif',
-  label: 'Vóór / ná — diagonaal',
-  omschrijving: 'Eén beeld dat diagonaal overgaat in het andere. Valt meer op in een tijdlijn dan een rechte deling.',
-  beelden: 'twee',
-  hoeken: ['voor-na'],
+const carrousel: Sjabloon = {
+  id: 'carrousel',
+  label: 'Carrousel-kaft',
+  omschrijving:
+    'Grote kop op beeld met een swipe-hint. Zet hem vóór een reeks van 3 tot 5 dia\'s; carrousels worden veel vaker opgeslagen.',
+  beelden: 'een',
+  hoeken: ['educatie', 'vergelijking', 'vraag-antwoord', 'bewijs'],
   teken: (x, s) => {
     const m = s.merk;
-    const beeldH = beeldBodem(x);
+    achtergrondBeeld(x, s, s.beeld);
+    rechthoek(x, 0, 0, x.w, x.h, metAlfa(m.kleuren.primairDonker, 0.62));
 
-    if (s.beeldVoor) beeldVullend(x, s.beeldVoor, 0, 0, x.w, beeldH);
-    else patroon(x, 0, 0, x.w, beeldH, metAlfa('#000000', 0.2), '#4B5563');
+    const padX = x.veilig.x;
+    const balk = balkTop(x);
 
-    // Het "ná"-beeld in een diagonaal masker eroverheen.
-    x.c.save();
-    x.c.beginPath();
-    x.c.moveTo(x.w * 0.38, 0);
-    x.c.lineTo(x.w, 0);
-    x.c.lineTo(x.w, beeldH);
-    x.c.lineTo(x.w * 0.62, beeldH);
-    x.c.closePath();
-    x.c.clip();
-    if (s.beeldNa) beeldVullend(x, s.beeldNa, 0, 0, x.w, beeldH);
-    else patroon(x, 0, 0, x.w, beeldH, metAlfa(m.kleuren.primair, 0.3), m.kleuren.primairDonker);
-    x.c.restore();
-
-    x.c.save();
-    x.c.strokeStyle = m.kleuren.accent;
-    x.c.lineWidth = x.u * 1.1;
-    x.c.beginPath();
-    x.c.moveTo(x.w * 0.38, 0);
-    x.c.lineTo(x.w * 0.62, beeldH);
-    x.c.stroke();
-    x.c.restore();
-
-    scrimBoven(x, 0.22, 0.4);
-    beeldLabel(x, s, 'vóór', x.u * 2.5, x.u * 2.5, true);
-    beeldLabel(x, s, 'ná', x.w - x.u * 14, x.u * 2.5, false);
-
-    onderblok(x, s, {
-      opTekst: '#FFFFFF',
-      zachteTekst: 'rgba(255,255,255,0.9)',
-      metCta: true,
-      maxKopRegels: 3,
-      maxKopGrootte: x.u * 9,
+    // Grote kop, gecentreerd in het bovenste deel.
+    const kopOpties = {
+      font: kopFont(m),
+      gewicht: '900',
+      kleur: '#FFFFFF',
+      regelhoogte: 1.03,
+      spatiering: m.typografie.kopSpatiering,
+      hoofdletters: m.typografie.kopHoofdletters,
       schaduw: true,
-      achtergrond: (top) =>
-        verloop(x, 0, top - x.u * 14, x.w, balkTop(x) - top + x.u * 14, [
-          [0, 'rgba(0,0,0,0)'],
-          [0.5, 'rgba(0,0,0,0.62)'],
-          [1, 'rgba(0,0,0,0.88)'],
-        ]),
-    });
+      uitlijning: 'center' as CanvasTextAlign,
+    };
+    const kopGrootte = passendeGrootte(x, s.inhoud.kop, x.veilig.w, kopOpties, x.u * 12, x.u * 4.5, 4);
+    const kopH = regelsVoor(x, s.inhoud.kop, x.veilig.w, { ...kopOpties, grootte: kopGrootte }).length * kopGrootte * 1.03;
+
+    const swipeH = x.u * 7;
+    let y = (balk - kopH - swipeH) / 2;
+
+    if (s.inhoud.badge) {
+      actiebadge(x, s, padX, y - x.u * 8, true);
+    }
+    y += tekst(x, s.inhoud.kop, padX, y, x.veilig.w, { ...kopOpties, grootte: kopGrootte });
+
+    if (s.inhoud.subkop) {
+      y += x.u * 1.5;
+      y += tekst(x, s.inhoud.subkop, padX + x.veilig.w * 0.08, y, x.veilig.w * 0.84, {
+        font: tekstFont(m),
+        grootte: x.u * 3,
+        gewicht: '600',
+        kleur: 'rgba(255,255,255,0.9)',
+        regelhoogte: 1.3,
+        schaduw: true,
+        uitlijning: 'center',
+      });
+    }
+
+    // Swipe-hint: het pijltje maakt duidelijk dat er meer dia's volgen.
+    const hint = 'Swipe';
+    x.c.save();
+    x.c.font = `800 ${x.u * 3}px ${kopFont(m)}`;
+    const hintW = x.c.measureText(hint.toUpperCase()).width + x.u * 12;
+    x.c.restore();
+    const hintX = (x.w - hintW) / 2;
+    const hintY = balk - x.u * 11;
+    rechthoek(x, hintX, hintY, hintW, x.u * 6.4, metAlfa('#FFFFFF', 0.16), x.u * 3.2);
+    x.c.save();
+    x.c.font = `800 ${x.u * 3}px ${kopFont(m)}`;
+    x.c.fillStyle = '#FFFFFF';
+    x.c.textAlign = 'left';
+    x.c.textBaseline = 'middle';
+    x.c.fillText(hint.toUpperCase(), hintX + x.u * 3.5, hintY + x.u * 3.2 + x.u * 0.2);
+    x.c.restore();
+    pijlNaarRechts(x, hintX + hintW - x.u * 4.4, hintY + x.u * 3.2, x.u * 1.8, m.kleuren.accent);
+
+    merkbalk(x, s, { donker: true });
   },
 };
+
+/** Klein pijltje naar rechts, gebruikt in de swipe-hint. */
+function pijlNaarRechts(x: Ctx, px: number, py: number, maat: number, kleur: string) {
+  const { c } = x;
+  c.save();
+  c.strokeStyle = kleur;
+  c.lineWidth = maat * 0.34;
+  c.lineCap = 'round';
+  c.lineJoin = 'round';
+  c.beginPath();
+  c.moveTo(px - maat, py);
+  c.lineTo(px + maat * 0.6, py);
+  c.moveTo(px + maat * 0.1, py - maat * 0.65);
+  c.lineTo(px + maat * 0.7, py);
+  c.lineTo(px + maat * 0.1, py + maat * 0.65);
+  c.stroke();
+  c.restore();
+}
 
 const aanbod: Sjabloon = {
   id: 'aanbod',
@@ -593,7 +596,7 @@ const aanbod: Sjabloon = {
     const paneelTop = Math.max(minPaneelTop, ctaY - x.u * 6 - meet());
 
     // Beeld bovenin, gekleurd paneel eronder.
-    achtergrondBeeld(x, s, s.beeldNa ?? s.beeldVoor, paneelTop);
+    achtergrondBeeld(x, s, s.beeld, paneelTop);
     rechthoek(x, 0, paneelTop, x.w, x.h - paneelTop, m.kleuren.primair);
     verloop(x, 0, paneelTop - x.u * 7, x.w, x.u * 7, [
       [0, 'rgba(0,0,0,0)'],
@@ -629,7 +632,7 @@ const statement: Sjabloon = {
   beelden: 'een',
   hoeken: ['bewijs', 'achter-de-schermen', 'urgentie', 'seizoen'],
   teken: (x, s) => {
-    achtergrondBeeld(x, s, s.beeldNa ?? s.beeldVoor);
+    achtergrondBeeld(x, s, s.beeld);
     scrimBoven(x, 0.25, 0.45);
 
     onderblok(x, s, {
@@ -684,7 +687,7 @@ const review: Sjabloon = {
     const kaartY = Math.max(x.h * 0.28, balkTop(x) - x.u * 3 - kaartH);
     const beeldH = kaartY + x.u * 6;
 
-    achtergrondBeeld(x, s, s.beeldNa ?? s.beeldVoor, beeldH);
+    achtergrondBeeld(x, s, s.beeld, beeldH);
     rechthoek(x, 0, beeldH, x.w, x.h - beeldH, m.kleuren.vlak);
     rechthoek(x, kaartX, kaartY, kaartW, kaartH, m.kleuren.achtergrond, x.u * 2);
 
@@ -739,7 +742,7 @@ const uspLijst: Sjabloon = {
 
     const paneelTop = Math.max(x.u * 6, ctaY - x.u * 3 - (badgeH + kopH + x.u * 3 + bulletsH));
 
-    achtergrondBeeld(x, s, s.beeldNa ?? s.beeldVoor, paneelTop);
+    achtergrondBeeld(x, s, s.beeld, paneelTop);
     rechthoek(x, 0, paneelTop, x.w, x.h - paneelTop, m.kleuren.achtergrond);
 
     let y = paneelTop + x.u * 3;
@@ -840,10 +843,10 @@ const lijstTips: Sjabloon = {
     const m = s.merk;
     rechthoek(x, 0, 0, x.w, x.h, m.kleuren.primair);
 
-    if (s.beeldNa ?? s.beeldVoor) {
+    if (s.beeld) {
       x.c.save();
       x.c.globalAlpha = 0.22;
-      beeldVullend(x, (s.beeldNa ?? s.beeldVoor) as CanvasImageSource, 0, 0, x.w, x.h);
+      beeldVullend(x, (s.beeld) as CanvasImageSource, 0, 0, x.w, x.h);
       x.c.restore();
     }
 
@@ -906,7 +909,7 @@ const probleem: Sjabloon = {
   hoeken: ['probleem-oplossing', 'seizoen'],
   teken: (x, s) => {
     const m = s.merk;
-    achtergrondBeeld(x, s, s.beeldVoor ?? s.beeldNa);
+    achtergrondBeeld(x, s, s.beeld);
     rechthoek(x, 0, 0, x.w, x.h, metAlfa(m.kleuren.primairDonker, 0.72));
 
     onderblok(x, s, {
@@ -933,10 +936,10 @@ const vraag: Sjabloon = {
 
     const vraagH = staand(x) ? x.h * 0.4 : x.h * 0.44;
     rechthoek(x, 0, 0, x.w, vraagH, m.kleuren.primair);
-    if (s.beeldNa ?? s.beeldVoor) {
+    if (s.beeld) {
       x.c.save();
       x.c.globalAlpha = 0.25;
-      beeldVullend(x, (s.beeldNa ?? s.beeldVoor) as CanvasImageSource, 0, 0, x.w, vraagH);
+      beeldVullend(x, (s.beeld) as CanvasImageSource, 0, 0, x.w, vraagH);
       x.c.restore();
     }
 
@@ -991,7 +994,7 @@ const cijfers: Sjabloon = {
   hoeken: ['bewijs'],
   teken: (x, s) => {
     const m = s.merk;
-    achtergrondBeeld(x, s, s.beeldNa ?? s.beeldVoor);
+    achtergrondBeeld(x, s, s.beeld);
     rechthoek(x, 0, 0, x.w, x.h, metAlfa(m.kleuren.primairDonker, 0.8));
 
     const padX = x.veilig.x;
@@ -1057,8 +1060,7 @@ const cijfers: Sjabloon = {
 };
 
 export const SJABLONEN: Sjabloon[] = [
-  voorNaSplit,
-  voorNaSchuif,
+  beeldKader,
   aanbod,
   statement,
   uspLijst,
@@ -1068,6 +1070,7 @@ export const SJABLONEN: Sjabloon[] = [
   lijstTips,
   vraag,
   cijfers,
+  carrousel,
 ];
 
 export const sjabloonById = (id: string): Sjabloon => SJABLONEN.find((s) => s.id === id) ?? SJABLONEN[0];
@@ -1088,10 +1091,7 @@ export function tekenOpCanvas(canvas: HTMLCanvasElement, spec: RenderSpec) {
 /** Waarschuwt als een sjabloon beelden nodig heeft die nog ontbreken. */
 export function ontbrekendBeeld(sjabloonId: string, spec: RenderSpec): string | null {
   const sj = sjabloonById(sjabloonId);
-  if (sj.beelden === 'twee' && (!spec.beeldVoor || !spec.beeldNa)) {
-    return 'Dit sjabloon werkt met twee beelden: een vóór- en een ná-foto.';
-  }
-  if (sj.beelden === 'een' && !spec.beeldVoor && !spec.beeldNa) {
+  if (sj.beelden === 'een' && !spec.beeld) {
     return 'Voeg een foto toe — met beeld haalt deze post veel meer bereik.';
   }
   return null;

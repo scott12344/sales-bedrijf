@@ -18,7 +18,7 @@ export const HASHTAG_KERN = [
 ];
 
 export const HASHTAG_PER_HOEK: Record<string, string[]> = {
-  'voor-na': ['voorenna', 'transformatie', 'metamorfose', 'renovatie', 'verbouwing'],
+  resultaat: ['opgeleverd', 'vakwerk', 'renovatie', 'afgerond', 'resultaat'],
   aanbod: ['actie', 'aanbieding', 'korting', 'offerte', 'gratisinmeten'],
   'probleem-oplossing': ['tocht', 'energierekening', 'condens', 'geluidsisolatie', 'stookkosten'],
   bewijs: ['tevredenklant', 'vakmanschap', 'kwaliteit', 'review', 'aanbevolen'],

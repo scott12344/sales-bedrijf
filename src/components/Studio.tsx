@@ -26,11 +26,11 @@ function leegIdee(kanalen: KanaalId[]): Idee {
   return {
     tekst: '',
     doel: 'offerteaanvraag',
-    hoek: 'voor-na',
+    hoek: 'resultaat',
     doelgroepId: 'gezin-jaren-70',
     actieId: '',
     kanalen: kanalen.length ? kanalen : ['instagram-feed', 'facebook-feed'],
-    sjabloonId: 'voor-na-split',
+    sjabloonId: 'beeld-kader',
     context: '',
   };
 }
@@ -145,8 +145,7 @@ export function Studio({ bewerkId, naKlaar }: { bewerkId?: ID; naKlaar?: () => v
           sjabloonId: idee.sjabloonId,
           merk,
           inhoud,
-          beeldVoorId: idee.mediaVoorId,
-          beeldNaId: idee.mediaNaId,
+          beeldId: idee.mediaId,
         },
         merk.logoMediaId,
       );
@@ -227,8 +226,8 @@ export function Studio({ bewerkId, naKlaar }: { bewerkId?: ID; naKlaar?: () => v
               opties={HOEKEN.map((h) => ({ waarde: h.id, label: h.label }))}
               gekozen={[idee.hoek]}
               zet={(v) => {
-                const hoek = (v[0] ?? 'voor-na') as Hoek;
-                const passend = SJABLONEN.find((s) => s.hoeken.includes(hoek));
+                const hoek = (v[0] ?? 'resultaat') as Hoek;
+                            const passend = SJABLONEN.find((s) => s.hoeken.includes(hoek));
                 setIdee({ ...idee, hoek, sjabloonId: passend?.id ?? idee.sjabloonId });
               }}
             />
@@ -269,18 +268,12 @@ export function Studio({ bewerkId, naKlaar }: { bewerkId?: ID; naKlaar?: () => v
           />
         </Kaart>
 
-        <Kaart titel="Beeld">
+        <Kaart titel="Beeld" hulp="Eén foto per post. Een sterke foto is het halve werk op social.">
           <BeeldKiezer
-            label="Foto vóór"
-            soort="voor"
-            gekozen={idee.mediaVoorId}
-            zet={(id) => setIdee((v) => ({ ...v, mediaVoorId: id }))}
-          />
-          <BeeldKiezer
-            label="Foto ná (of hoofdbeeld)"
-            soort="na"
-            gekozen={idee.mediaNaId}
-            zet={(id) => setIdee((v) => ({ ...v, mediaNaId: id }))}
+            label="Foto"
+            soort="project"
+            gekozen={idee.mediaId}
+            zet={(id) => setIdee((v) => ({ ...v, mediaId: id }))}
           />
         </Kaart>
 
@@ -360,8 +353,7 @@ export function Studio({ bewerkId, naKlaar }: { bewerkId?: ID; naKlaar?: () => v
                 kanaal={k}
                 merk={merk}
                 inhoud={inhoud}
-                beeldVoorId={idee.mediaVoorId}
-                beeldNaId={idee.mediaNaId}
+                beeldId={idee.mediaId}
                 naam={idee.tekst || uitwerking.kop}
               />
             ))}

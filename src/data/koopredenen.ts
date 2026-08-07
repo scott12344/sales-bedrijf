@@ -145,7 +145,7 @@ export const KOOPREDENEN: Koopreden[] = [
     lang: [
       'Gemiddeld een {score} uit {aantal} beoordelingen. Niet omdat we het zeggen, maar omdat klanten het opschrijven.',
     ],
-    hoeken: ['bewijs', 'voor-na', 'aanbod'],
+    hoeken: ['bewijs', 'resultaat', 'aanbod'],
     gewicht: 9,
   },
   {
@@ -157,7 +157,7 @@ export const KOOPREDENEN: Koopreden[] = [
       'We zijn deze week in {plaats} aan het werk. Wil je zien wat er bij jou mogelijk is? Dan komen we gewoon even langs.',
       'Lokaal bedrijf, korte lijnen. Geen callcenter maar iemand die weet waar je straat ligt.',
     ],
-    hoeken: ['voor-na', 'achter-de-schermen', 'aanbod', 'urgentie'],
+    hoeken: ['resultaat', 'achter-de-schermen', 'aanbod', 'urgentie'],
     gewicht: 8,
   },
   {
@@ -234,7 +234,7 @@ export const KOOPREDENEN: Koopreden[] = [
     lang: [
       'Alles wordt op maat gemaakt, in de kleur die bij je woning past — van klassiek wit tot antracietgrijs of houtlook. Je ziet vooraf hoe het eruit komt te zien.',
     ],
-    hoeken: ['voor-na', 'educatie', 'aanbod'],
+    hoeken: ['resultaat', 'educatie', 'aanbod'],
     gewicht: 7,
   },
   {

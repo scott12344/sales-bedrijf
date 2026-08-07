@@ -111,8 +111,8 @@ export type FormaatId =
 export type Doel = 'offerteaanvraag' | 'bellen' | 'whatsapp' | 'bereik' | 'volgers' | 'vertrouwen';
 
 export type Hoek =
-  | 'voor-na'
   | 'aanbod'
+  | 'resultaat'
   | 'probleem-oplossing'
   | 'bewijs'
   | 'educatie'
@@ -130,8 +130,8 @@ export interface Idee {
   actieId: ID | '';
   kanalen: KanaalId[];
   sjabloonId: string;
-  mediaVoorId?: ID;
-  mediaNaId?: ID;
+  /** Het beeld bij deze post. */
+  mediaId?: ID;
   /** Vrije notitie van de gebruiker die de motor meeneemt. */
   context: string;
 }
@@ -209,7 +209,7 @@ export interface MediaRecord {
   naam: string;
   breedte: number;
   hoogte: number;
-  soort: 'voor' | 'na' | 'sfeer' | 'logo' | 'team' | 'review';
+  soort: 'project' | 'sfeer' | 'detail' | 'team' | 'review' | 'logo';
   gemaakt: number;
   tags: string[];
 }

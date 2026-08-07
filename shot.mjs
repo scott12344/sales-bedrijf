@@ -64,10 +64,8 @@ const maakFoto = async (variant) =>
     return c.toDataURL('image/jpeg', 0.9);
   }, variant);
 
-for (const variant of ['voor', 'na']) {
-  const dataUrl = await maakFoto(variant);
-  fs.writeFileSync(path.join(uit, `${variant}.jpg`), Buffer.from(dataUrl.split(',')[1], 'base64'));
-}
+const foto = await maakFoto('na');
+fs.writeFileSync(path.join(uit, 'foto.jpg'), Buffer.from(foto.split(',')[1], 'base64'));
 
 /* Merkprofiel invullen. */
 await page.getByRole('tab', { name: 'Merk & aanbod' }).click();
@@ -95,9 +93,7 @@ await page.screenshot({ path: path.join(uit, '02-merk.png'), fullPage: true });
 /* Studio: foto's koppelen. */
 await page.getByRole('tab', { name: 'Studio' }).click();
 await page.waitForTimeout(500);
-await page.locator('div.veld', { hasText: 'Foto vóór' }).first().locator('input[type=file]').setInputFiles(path.join(uit, 'voor.jpg'));
-await page.waitForTimeout(700);
-await page.locator('div.veld', { hasText: 'Foto ná' }).first().locator('input[type=file]').setInputFiles(path.join(uit, 'na.jpg'));
+await page.locator('div.veld', { hasText: 'Foto' }).first().locator('input[type=file]').setInputFiles(path.join(uit, 'foto.jpg'));
 await page.waitForTimeout(900);
 await page.screenshot({ path: path.join(uit, '03-studio.png'), fullPage: true });
 

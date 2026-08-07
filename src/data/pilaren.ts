@@ -24,12 +24,12 @@ export const PILAREN: Pilaar[] = [
     label: 'Bewijs & resultaat',
     aandeel: 35,
     doel: 'Laten zien dat je het echt kunt. Dit is de content die leads oplevert zonder dat je iets hoeft te beloven.',
-    hoeken: ['voor-na', 'bewijs'],
+    hoeken: ['bewijs', 'resultaat'],
     voorbeelden: [
-      'Vóór/ná van een woning in de regio',
+      'Een opgeleverd project in de regio',
       'Klantreactie letterlijk geciteerd',
       'Detailfoto van een strakke afwerking',
-      'Tijdlijn: ochtend oud, middag nieuw',
+      'Jullie cijfers van dit jaar',
     ],
     kleurAccent: '#2E9E5B',
   },
@@ -82,8 +82,8 @@ export const pilaarVoorHoek = (hoek: Hoek): Pilaar =>
   PILAREN.find((p) => p.hoeken.includes(hoek)) ?? PILAREN[0];
 
 export const HOEKEN: { id: Hoek; label: string; uitleg: string }[] = [
-  { id: 'voor-na', label: 'Vóór / ná', uitleg: 'Het transformatiebeeld. Het hardst werkende format in deze branche.' },
   { id: 'aanbod', label: 'Aanbod', uitleg: 'De actie of dienst centraal, met een duidelijke oproep.' },
+  { id: 'resultaat', label: 'Resultaat', uitleg: 'Een opgeleverd project in beeld. Laat het werk voor zich spreken.' },
   { id: 'probleem-oplossing', label: 'Probleem → oplossing', uitleg: 'Benoem de ergernis, laat zien hoe het opgelost wordt.' },
   { id: 'bewijs', label: 'Bewijs', uitleg: 'Reviews, cijfers, keurmerken, opgeleverde projecten.' },
   { id: 'educatie', label: 'Uitleg', uitleg: 'Leer iets uit. Bouwt vertrouwen bij wie nog aan het oriënteren is.' },

@@ -134,7 +134,7 @@ export const DOELGROEPEN: Doelgroep[] = [
     id: 'breed',
     label: 'Breed publiek in het werkgebied',
     omschrijving:
-      'Iedereen met een koopwoning in de regio. Gebruik je voor merkbekendheid, vóór/ná-content en bewijs — niet voor scherpe aanbiedingen.',
+      'Iedereen met een koopwoning in de regio. Gebruik je voor merkbekendheid, opgeleverd werk en bewijs — niet voor scherpe aanbiedingen.',
     leeftijd: '28-75',
     pijn: ['Huis voelt gedateerd', 'Twijfel over welke partij te kiezen'],
     verlangen: ['Een huis om trots op te zijn', 'Een partij die het gewoon goed regelt'],
