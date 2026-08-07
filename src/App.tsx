@@ -5,15 +5,27 @@ import { Kalender } from './components/Kalender';
 import { MerkScherm } from './components/Merk';
 import { MediaScherm } from './components/Media';
 import { KoppelingenScherm } from './components/Koppelingen';
+import { Goedkeuring } from './components/Goedkeuring';
+import { Aanleveren } from './components/Aanleveren';
 import { useStore } from './store/store';
 import { Tabbladen } from './components/ui';
 
-type Scherm = 'vandaag' | 'studio' | 'kalender' | 'beeld' | 'merk' | 'koppelingen';
+type Scherm =
+  | 'vandaag'
+  | 'studio'
+  | 'goedkeuren'
+  | 'kalender'
+  | 'aanleveren'
+  | 'beeld'
+  | 'merk'
+  | 'koppelingen';
 
 export default function App() {
   const { staat, geladen, opslagfout } = useStore();
   const [scherm, setScherm] = useState<Scherm>('vandaag');
   const [campagneId, setCampagneId] = useState<string | undefined>();
+
+  const teGoedkeuren = staat.posts.filter((p) => p.status === 'concept').length;
 
   const openCampagne = (id: string) => {
     setCampagneId(id);
@@ -51,7 +63,9 @@ export default function App() {
           tabs={[
             { id: 'vandaag', label: 'Vandaag' },
             { id: 'studio', label: 'Studio' },
+            { id: 'goedkeuren', label: teGoedkeuren ? `Goedkeuren (${teGoedkeuren})` : 'Goedkeuren' },
             { id: 'kalender', label: 'Kalender' },
+            { id: 'aanleveren', label: 'Aanleveren' },
             { id: 'beeld', label: 'Beeldbank' },
             { id: 'merk', label: 'Merk & aanbod' },
             { id: 'koppelingen', label: 'Koppelingen' },
@@ -72,10 +86,13 @@ export default function App() {
             naarStudio={nieuweCampagne}
             naarKalender={() => setScherm('kalender')}
             naarMerk={() => setScherm('merk')}
+            naarGoedkeuring={() => setScherm('goedkeuren')}
             openCampagne={openCampagne}
           />
         )}
         {scherm === 'studio' && <Studio bewerkId={campagneId} />}
+        {scherm === 'goedkeuren' && <Goedkeuring openCampagne={openCampagne} />}
+        {scherm === 'aanleveren' && <Aanleveren naarGoedkeuring={() => setScherm('goedkeuren')} />}
         {scherm === 'kalender' && <Kalender openCampagne={openCampagne} />}
         {scherm === 'beeld' && <MediaScherm />}
         {scherm === 'merk' && <MerkScherm />}

@@ -235,6 +235,19 @@ export interface Koppeling {
 
 /* --------------------------------------------------------------- systeem */
 
+export interface Autopiloot {
+  /** Vult de kalender zelf bij zodra er te weinig gepland staat. */
+  aan: boolean;
+  /** Hoeveel weken de planning vooruit moet lopen. */
+  wekenVooruit: number;
+  /** Onder dit aantal openstaande posts wordt er bijgevuld. */
+  ondergrens: number;
+  /** Nieuwe posts meteen op goedgekeurd zetten in plaats van ter goedkeuring. */
+  directGoedkeuren: boolean;
+  /** Wanneer er voor het laatst automatisch is bijgevuld. */
+  laatsteAanvulling: number;
+}
+
 export interface Instellingen {
   /** Aantal posts per week dat het ritme aanhoudt. */
   postsPerWeek: number;
@@ -242,6 +255,7 @@ export interface Instellingen {
   /** Verdeling over de contentpilaren, in procenten. */
   mix: Record<string, number>;
   startDag: number;
+  autopiloot: Autopiloot;
 }
 
 export interface AppState {

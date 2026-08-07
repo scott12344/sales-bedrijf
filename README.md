@@ -45,6 +45,18 @@ over de contentpilaren (bewijs, aanbod, uitleg, mensen) is instelbaar en wordt
 automatisch bewaakt: een tijdlijn die alleen uit aanbiedingen bestaat brandt op.
 Ideeën komen uit een ideeënbank met seizoensgebonden invalshoeken.
 
+**Autopiloot & goedkeuren** — Zet de autopiloot aan en het systeem vult de planning
+zelf bij zodra die leegloopt (bij het openen van de app; er draait geen server mee).
+Alles komt bij **Goedkeuren** te staan met beeld en caption erbij: goedkeuren,
+aanpassen of weggooien. Alleen goedgekeurde posts komen in de publicatiewachtrij.
+
+**Aanleveren** — Laat content buiten de app schrijven en lees hem hier in. Je
+kopieert de briefing (merk, aanbod, formaat) naar een tekstschrijver, bureau of
+AI-assistent en plakt het JSON-pakket dat je terugkrijgt in het invoervak. Wat is
+aangeleverd wint; alles wat ontbreekt vult de tekstmotor aan — een pakket met
+alleen koppen levert dus complete posts met captions op. In teksten mag je
+`{plaats}`, `{actie}`, `{garantie}` en `{score}` gebruiken.
+
 **Merk & aanbod** — Kleurenpalet, lettertypen, logo, werkgebied, bewijscijfers en
 je lopende acties. Alles wat je hier invult komt automatisch in elke post terecht.
 

@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { kanaalById } from '../data/kanalen';
 import { PILAREN, pilaarById, SEIZOENSHAKEN } from '../data/pilaren';
 import { IDEEENBANK } from '../data/ideeen';
-import { balans } from '../engine/kalender';
+import { autoAanvullen, balans } from '../engine/kalender';
 import { useStore } from '../store/store';
 import { Kaart, Leeg } from './ui';
 
@@ -13,14 +13,16 @@ export function Dashboard({
   naarStudio,
   naarKalender,
   naarMerk,
+  naarGoedkeuring,
   openCampagne,
 }: {
   naarStudio: () => void;
   naarKalender: () => void;
   naarMerk: () => void;
+  naarGoedkeuring: () => void;
   openCampagne: (id: string) => void;
 }) {
-  const { staat } = useStore();
+  const { staat, verstuur } = useStore();
   const merk = staat.merk;
   const vandaag = new Date();
 
@@ -36,6 +38,27 @@ export function Dashboard({
 
   const verdeling = balans(komende);
   const totaal = Object.values(verdeling).reduce((a, b) => a + b, 0) || 1;
+
+  const auto = staat.instellingen.autopiloot;
+  const terGoedkeuring = staat.posts.filter((p) => p.status === 'concept').length;
+
+  const zetAuto = (wijziging: Partial<typeof auto>) =>
+    verstuur({
+      type: 'instellingen',
+      instellingen: { ...staat.instellingen, autopiloot: { ...auto, ...wijziging } },
+    });
+
+  const vulNuBij = () => {
+    // Even doen alsof de autopiloot aanstaat, zodat de knop ook werkt als hij uit is.
+    const resultaat = autoAanvullen({
+      ...staat,
+      instellingen: { ...staat.instellingen, autopiloot: { ...auto, aan: true, ondergrens: 9999 } },
+    });
+    if (!resultaat) return;
+    for (const campagne of resultaat.campagnes) verstuur({ type: 'campagne-toevoegen', campagne });
+    verstuur({ type: 'posts-toevoegen', posts: resultaat.posts });
+    zetAuto({ laatsteAanvulling: Date.now() });
+  };
 
   const actieveActie = merk.acties.find((a) => a.actief);
   const maandHaak = SEIZOENSHAKEN[vandaag.getMonth() + 1];
@@ -139,6 +162,56 @@ export function Dashboard({
         </Kaart>
 
         <div>
+          <Kaart
+            titel="Autopiloot"
+            hulp="Laat het systeem de planning zelf vullen. Jij keurt alleen nog goed."
+            rechts={
+              <span
+                className="label"
+                style={{
+                  background: auto.aan ? 'var(--goed)' : 'var(--paneel-2)',
+                  color: auto.aan ? '#0b1220' : undefined,
+                }}
+              >
+                {auto.aan ? 'Aan' : 'Uit'}
+              </span>
+            }
+          >
+            <label className="checkbox">
+              <input type="checkbox" checked={auto.aan} onChange={(e) => zetAuto({ aan: e.target.checked })} />
+              <span>
+                Vul de planning zelf bij
+                <p className="hulptekst">
+                  Zodra er minder dan {auto.ondergrens} posts openstaan, plant het systeem {auto.wekenVooruit} weken
+                  vooruit bij. Dat gebeurt op het moment dat je de app opent — er draait geen server mee.
+                </p>
+              </span>
+            </label>
+            <label className="checkbox">
+              <input
+                type="checkbox"
+                checked={auto.directGoedkeuren}
+                onChange={(e) => zetAuto({ directGoedkeuren: e.target.checked })}
+              />
+              <span>
+                Zonder goedkeuring klaarzetten
+                <p className="hulptekst">
+                  Uit: alles komt eerst bij Goedkeuren te staan. Aan: het staat meteen klaar om te publiceren.
+                </p>
+              </span>
+            </label>
+            <div className="knoprij" style={{ marginTop: 10 }}>
+              <button type="button" className="knop primair" onClick={vulNuBij}>
+                ✨ Vul nu bij
+              </button>
+              {terGoedkeuring > 0 && (
+                <button type="button" className="knop" onClick={naarGoedkeuring}>
+                  {terGoedkeuring} wachten op goedkeuring →
+                </button>
+              )}
+            </div>
+          </Kaart>
+
           <Kaart titel={`Aan de slag — ${gedaan}/${stappen.length}`} hulp="Hoe vollediger dit staat, hoe scherper de content wordt.">
             {stappen.map((s) => (
               <div key={s.tekst} style={{ display: 'flex', gap: 10, padding: '4px 0', alignItems: 'center' }}>

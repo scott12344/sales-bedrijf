@@ -11,6 +11,7 @@ import {
 import type { AppState, Campagne, Koppeling, Merk, Post } from '../types';
 import { standaardMerk } from '../data/merk';
 import { PILAREN } from '../data/pilaren';
+import { autoAanvullen } from '../engine/kalender';
 import { bewaarStaat, laadStaat } from './db';
 import { nieuwId } from './media';
 
@@ -58,6 +59,13 @@ export function leegStaat(): AppState {
       actieveKanalen: ['instagram-feed', 'facebook-feed', 'instagram-story', 'tiktok'],
       mix: Object.fromEntries(PILAREN.map((p) => [p.id, p.aandeel])),
       startDag: 1,
+      autopiloot: {
+        aan: false,
+        wekenVooruit: 4,
+        ondergrens: 6,
+        directGoedkeuren: false,
+        laatsteAanvulling: 0,
+      },
     },
     versie: STAAT_VERSIE,
   };
@@ -164,6 +172,28 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       afgebroken = true;
     };
   }, []);
+
+  /* Autopiloot: bij het openen van de app aanvullen als de planning leegloopt.
+     Eén keer per sessie is genoeg — daarna zorgt de gebruiker zelf voor de rest. */
+  const autoGedraaid = useRef(false);
+  useEffect(() => {
+    if (!geladen || autoGedraaid.current) return;
+    autoGedraaid.current = true;
+    const resultaat = autoAanvullen(staat);
+    if (!resultaat) return;
+    verstuur({
+      type: 'alles-vervangen',
+      staat: {
+        ...staat,
+        campagnes: [...resultaat.campagnes, ...staat.campagnes],
+        posts: [...staat.posts, ...resultaat.posts],
+        instellingen: {
+          ...staat.instellingen,
+          autopiloot: { ...staat.instellingen.autopiloot, laatsteAanvulling: Date.now() },
+        },
+      },
+    });
+  }, [geladen, staat]);
 
   // Opslaan met een korte vertraging, zodat typen niet elke toetsaanslag wegschrijft.
   useEffect(() => {

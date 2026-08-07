@@ -6,7 +6,7 @@
  * uitleg en mensen — zodat de tijdlijn niet één lange reclamefolder wordt.
  */
 
-import type { Campagne, Idee, Instellingen, KanaalId, Merk, Post } from '../types';
+import type { AppState, Campagne, Idee, Instellingen, KanaalId, Merk, Post } from '../types';
 import { IDEEENBANK, ideeenVoorMaand, type IdeeSjabloon } from '../data/ideeen';
 import { PILAREN } from '../data/pilaren';
 import { kanaalById } from '../data/kanalen';
@@ -115,6 +115,7 @@ export function genereerPlan(
 export function planRegelNaarCampagne(
   regel: PlanRegel,
   merk: Merk,
+  status: Post['status'] = 'gepland',
 ): { campagne: Campagne; posts: Post[] } {
   const actieveActie = merk.acties.find((a) => a.actief);
   const idee: Idee = {
@@ -147,12 +148,57 @@ export function planRegelNaarCampagne(
     kanaal,
     datum: regel.datum,
     tijd: regel.tijd,
-    status: 'gepland',
+    status,
     pilaar: regel.pilaar,
     notitie: regel.idee.beeld,
   }));
 
   return { campagne, posts };
+}
+
+/**
+ * Autopiloot: vult de planning zelf bij zodra er te weinig openstaat.
+ *
+ * Er draait geen server, dus dit gebeurt op het moment dat je de app opent. Dat
+ * is genoeg: zolang je er af en toe in kijkt, loopt de planning altijd de
+ * ingestelde periode vooruit.
+ */
+export function autoAanvullen(
+  staat: AppState,
+  nu: Date = new Date(),
+): { campagnes: Campagne[]; posts: Post[] } | null {
+  const auto = staat.instellingen.autopiloot;
+  if (!auto.aan) return null;
+
+  const vandaag = isoDatum(nu);
+  const open = staat.posts.filter((p) => p.datum >= vandaag && p.status !== 'gepubliceerd');
+  if (open.length >= auto.ondergrens) return null;
+
+  // Verder plannen vanaf de laatste dag die al bezet is, zodat er geen gaten
+  // vallen en niets dubbel op dezelfde dag komt.
+  const bezet = new Set(staat.posts.map((p) => p.datum));
+  const datums = staat.posts.map((p) => p.datum).sort();
+  const laatste = datums[datums.length - 1];
+  const start = new Date(nu);
+  if (laatste && laatste >= vandaag) {
+    start.setTime(new Date(laatste).getTime());
+    start.setDate(start.getDate() + 1);
+  }
+
+  const plan = genereerPlan(staat.instellingen, Math.max(1, auto.wekenVooruit), start).filter(
+    (regel) => regel.datum >= vandaag && !bezet.has(regel.datum),
+  );
+  if (!plan.length) return null;
+
+  const status: Post['status'] = auto.directGoedkeuren ? 'goedgekeurd' : 'concept';
+  const campagnes: Campagne[] = [];
+  const posts: Post[] = [];
+  for (const regel of plan) {
+    const gemaakt = planRegelNaarCampagne(regel, staat.merk, status);
+    campagnes.push(gemaakt.campagne);
+    posts.push(...gemaakt.posts);
+  }
+  return { campagnes, posts };
 }
 
 /** Hoeveel posts staan er per pilaar in een periode — voor de balanscontrole. */
