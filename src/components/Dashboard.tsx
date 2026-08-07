@@ -70,8 +70,10 @@ export function Dashboard({
         >
           {achterstallig.length > 0 && (
             <div className="banner">
-              {achterstallig.length} post{achterstallig.length === 1 ? '' : 's'} staat nog open uit het verleden.
-              Publiceer of verplaats {achterstallig.length === 1 ? 'hem' : 'ze'} — een gat in je ritme kost bereik.
+              {achterstallig.length === 1
+                ? '1 post staat nog open uit het verleden. Publiceer of verplaats hem'
+                : `${achterstallig.length} posts staan nog open uit het verleden. Publiceer of verplaats ze`}{' '}
+              — een gat in je ritme kost bereik.
             </div>
           )}
 

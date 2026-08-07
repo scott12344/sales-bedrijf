@@ -45,7 +45,9 @@ function pilaarVolgorde(mix: Record<string, number>, aantal: number): string[] {
 
 /** Spreidt n posts over de week, met het zwaartepunt op dinsdag t/m donderdag. */
 function dagenVoorWeek(aantal: number): number[] {
-  const voorkeur = [2, 4, 6, 3, 1, 5, 0]; // di, do, za, wo, ma, vr, zo
+  // 0 = maandag. Dinsdag t/m donderdag eerst: daar zit in deze branche de meeste
+  // interactie, het weekend gebruiken we pas als er meer posts per week zijn.
+  const voorkeur = [1, 3, 5, 2, 0, 4, 6]; // di, do, za, wo, ma, vr, zo
   return voorkeur.slice(0, Math.min(aantal, 7)).sort((a, b) => a - b);
 }
 
